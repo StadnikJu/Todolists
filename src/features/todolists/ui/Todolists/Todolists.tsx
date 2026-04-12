@@ -3,9 +3,17 @@ import { selectTodolists } from "@/features/todolists/model/todolists-selectors"
 import { TodolistItem } from "./TodolistItem/TodolistItem";
 import Grid from "@mui/material/Grid2";
 import Paper from "@mui/material/Paper";
+import { useAppDispatch } from "@/common/hooks";
+import { useEffect } from "react";
+import { fetchTodolistsTC } from "../../model/todolists-slice";
 
 export const Todolists = () => {
   const todolists = useAppSelector(selectTodolists);
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(fetchTodolistsTC());
+  }, [])
 
   return (
     <>

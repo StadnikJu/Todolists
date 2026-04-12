@@ -4,8 +4,8 @@ import {
   createTaskAC,
   deleteTaskAC,
   tasksReducer, type TasksState
-} from '../tasks-reducer'
-import {createTodolistAC, deleteTodolistAC} from '../todolists-reducer'
+} from '../tasks-slice'
+import { createTodolistTC, deleteTodolistTC} from '../todolists-slice'
 
 let startState: TasksState = {}
 
@@ -68,7 +68,18 @@ test('correct task should change its title', () => {
 })
 
 test('array should be created for new todolist', () => {
-  const endState = tasksReducer(startState, createTodolistAC('New todolist'))
+  const endState = tasksReducer(startState, createTodolistTC.fulfilled(
+      {
+        id: 'todolistId3',
+        title: 'New todolist',
+        filter: "all",
+        addedDate: '',
+        order: 0,
+      },
+      'requestId-1',
+      {title: "New todolist"}
+    )
+  )
 
   const keys = Object.keys(endState)
   const newKey = keys.find(k => k !== 'todolistId1' && k !== 'todolistId2')
@@ -81,7 +92,10 @@ test('array should be created for new todolist', () => {
 })
 
 test('property with todolistId should be deleted', () => {
-  const endState = tasksReducer(startState, deleteTodolistAC({id: 'todolistId2'}))
+  const endState = tasksReducer(
+    startState,
+    deleteTodolistTC.fulfilled({ id: 'todolistId2' }, 'requestId', { id: 'todolistId2' }),
+  )
 
   const keys = Object.keys(endState)
 
