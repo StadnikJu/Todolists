@@ -14,12 +14,12 @@ export const tasksApi = {
     const { todolistId, taskId } = args;
     return instance.delete<BaseResponse<{}>>(`/todo-lists/${todolistId}/tasks/${taskId}`);
   },
-  updateTaskStatus: (args: { todolistId: string; taskId: string; model: UpdateTaskModel }) => {
-    const { todolistId, taskId, model } = args;
-    return instance.put<BaseResponse<{ item: DomainTask }>>(`/todo-lists/${todolistId}/tasks/${taskId}`, model);
+  updateTask1: (task: DomainTask) => {
+    const { todoListId, id } = task;
+    return instance.put<BaseResponse<{ item: DomainTask }>>(`/todo-lists/${todoListId}/tasks/${id}`, task);
   },
-  updateTaskTitle: (args: { todolistId: string; taskId: string; model: UpdateTaskModel }) => {
-    const { todolistId, taskId, model } = args;
+   updateTask: (args: { todolistId: string; taskId: string; model: UpdateTaskModel }) => {
+    const { todolistId, taskId, model} = args;
     return instance.put<BaseResponse<{ item: DomainTask }>>(`/todo-lists/${todolistId}/tasks/${taskId}`, model);
-  },
+   }
 };
