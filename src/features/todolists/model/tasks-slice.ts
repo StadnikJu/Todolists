@@ -1,9 +1,10 @@
 import { createTodolistTC, deleteTodolistTC } from "./todolists-slice";
-import { createAppSlice } from "@/common/utils";
+import { catchErrorHAndler, createAppSlice, resultCodeHandler } from "@/common/utils";
 import { tasksApi } from "../api/tasksApi";
 import { DomainTask, UpdateTaskModel } from "../api/tasksApi.types";
 import { changeStatusAC } from "@/app/app-slice";
 import { RootState } from "@/app/store";
+import { ResultCode } from "@/common/enum/enums";
 
 export const tasksSlice = createAppSlice({
   name: "tasks",
@@ -37,8 +38,16 @@ export const tasksSlice = createAppSlice({
             dispatch(changeStatusAC({ status: "loading" }));
             const res = await tasksApi.createTasks(args);
             const newTask = res.data.data.item;
-            return newTask;
+            
+            if (res.data.resultCode === ResultCode.Success) {
+              return newTask;
+            } else {
+              resultCodeHandler(res.data, dispatch);
+              return rejectWithValue(null);
+            }
+
           } catch (error) {
+            catchErrorHAndler(error, dispatch);
             return rejectWithValue(error);
           } finally {
             dispatch(changeStatusAC({ status: "idle" }));
@@ -55,9 +64,17 @@ export const tasksSlice = createAppSlice({
         async (args: { todolistId: string; taskId: string }, { rejectWithValue, dispatch }) => {
           try {
             dispatch(changeStatusAC({ status: "loading" }));
-            await tasksApi.deleteTasks(args);
-            return args;
+            const res = await tasksApi.deleteTasks(args);
+
+            if(res.data.resultCode === ResultCode.Success) {
+              return args;
+            } else {
+              catchErrorHAndler(res.data, dispatch);
+              return rejectWithValue(null)
+            }
+
           } catch (error) {
+            catchErrorHAndler(error, dispatch);
             return rejectWithValue(error);
           } finally {
             dispatch(changeStatusAC({ status: "idle" }));
@@ -100,8 +117,16 @@ export const tasksSlice = createAppSlice({
             };
 
             const res = await tasksApi.updateTask({ todolistId: args.todolistId, taskId: args.taskId, model });
-            return { task: res.data.data.item };
+
+            if(res.data.resultCode === ResultCode.Success) {
+              return { task: res.data.data.item };
+            } else {
+              catchErrorHAndler(res.data, dispatch);
+              return rejectWithValue(null);
+            }
+            
           } catch (error) {
+            catchErrorHAndler(error, dispatch);
             return rejectWithValue(error);
           } finally {
             dispatch(changeStatusAC({ status: "idle" }));
@@ -130,7 +155,7 @@ export const tasksSlice = createAppSlice({
       });
   },
 });
-
+ 
 export const { fetchTasksTC, createTaskTC, deleteTaskTC, updateTaskTC } = tasksSlice.actions;
 export const tasksReducer = tasksSlice.reducer;
 
@@ -141,3 +166,5 @@ export type Task = {
 };
 
 export type TasksState = Record<string, DomainTask[]>;
+
+export const { selectTasks } = tasksSlice.selectors;

@@ -5,7 +5,7 @@ import List from "@mui/material/List";
 import { DomainTodolist } from "@/features/todolists/model/todolists-slice";
 import { useEffect } from "react";
 import { useAppDispatch } from "@/common/hooks";
-import { fetchTasksTC } from "@/features/todolists/model/tasks-slice";
+import { fetchTasksTC, selectTasks } from "@/features/todolists/model/tasks-slice";
 import { TaskStatus } from "@/common/enum/enums";
 
 type Props = {
@@ -15,7 +15,7 @@ type Props = {
 export const Tasks = ({ todolist }: Props) => {
   const { id, filter } = todolist;
 
-  const tasks = useAppSelector((state) => state.tasks);
+  const tasks = useAppSelector(selectTasks);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -38,7 +38,7 @@ export const Tasks = ({ todolist }: Props) => {
       ) : (
         <List>
           {filteredTasks?.map((task) => (
-            <TaskItem key={task.id} task={task} todolistId={id} />
+            <TaskItem key={task.id} task={task} todolist={todolist} todolistId={id} />
           ))}
         </List>
       )}
