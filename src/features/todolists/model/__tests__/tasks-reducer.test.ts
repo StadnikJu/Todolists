@@ -1,8 +1,8 @@
 import { nanoid } from "@reduxjs/toolkit";
 import { beforeEach, expect, test } from "vitest";
-import { createTaskTC, deleteTaskTC, tasksReducer, type TasksState, updateTaskTC } from "../tasks-slice";
-import { createTodolistTC, deleteTodolistTC } from "../todolists-slice";
+import { createTaskTC, deleteTaskTC, tasksReducer, type TasksState, updateTaskTC } from "../slices/tasks-slice";
 import { TaskPriority, TaskStatus } from "@/common/enum/enums";
+import { createTodolistTC, deleteTodolistTC } from "../slices/todolists-slice";
 
 let startState: TasksState = {};
 

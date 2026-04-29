@@ -1,9 +1,10 @@
-import { Todolist } from "../api/todolistsApi.types";
-import { todolistsApi } from "../api/todolistsApi";
-import { catchErrorHAndler, createAppSlice, resultCodeHandler } from "@/common/utils";
+import { catchErrorHandler, createAppSlice, resultCodeHandler } from "@/common/utils";
 import { changeStatusAC } from "@/app/app-slice";
 import { RequestStatus } from "@/common/types";
 import { ResultCode } from "@/common/enum/enums";
+import { todolistsApi } from "../../api/todolistsApi";
+import { Todolist } from "../../api/todolistsApi.types";
+import { todolistSchema } from "../schemes/todolists.schema";
 
 export const todolistsSlice = createAppSlice({
   name: "todolists",
@@ -18,9 +19,11 @@ export const todolistsSlice = createAppSlice({
           try {
             dispatch(changeStatusAC({ status: "loading" }));
             const res = await todolistsApi.getTodolists();
-            return { todolists: res.data };
+            const todolists = todolistSchema.array().parse(res.data); // zod
+            return { todolists };
           } catch (error) {
-            return rejectWithValue(error);
+            catchErrorHandler(error, dispatch);
+            return rejectWithValue(null);
           } finally {
             dispatch(changeStatusAC({ status: "idle" }));
           }
@@ -43,14 +46,15 @@ export const todolistsSlice = createAppSlice({
             dispatch(changeStatusAC({ status: "idle" }));
 
             if (res.data.resultCode === ResultCode.Success) {
-              return { todolist: res.data.data.item };
+              const todolist = todolistSchema.parse(res.data.data.item) // ZOD
+              return { todolist };
             } else {
               resultCodeHandler(res.data, dispatch);
               return rejectWithValue(null);
             }
 
           } catch (error) {
-            catchErrorHAndler(error, dispatch);
+            catchErrorHandler(error, dispatch);
             return rejectWithValue(null);
           }
         },
@@ -69,7 +73,8 @@ export const todolistsSlice = createAppSlice({
             return args;
           } catch (error) {
             dispatch(changeTodolistEntityStatusAC({ id: args.id, entityStatus: "failed" }));
-            return rejectWithValue(error);
+            catchErrorHandler(error, dispatch);
+            return rejectWithValue(null);
           } finally {
             dispatch(changeStatusAC({ status: "idle" }));
           }
@@ -97,7 +102,7 @@ export const todolistsSlice = createAppSlice({
             }
             
           } catch (error) {
-            catchErrorHAndler(error, dispatch);
+            catchErrorHandler(error, dispatch);
             return rejectWithValue(null);
           } finally {
             dispatch(changeStatusAC({ status: "idle" }));

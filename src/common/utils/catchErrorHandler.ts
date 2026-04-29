@@ -1,16 +1,27 @@
 import { changeStatusAC, setErrorAC } from "@/app/app-slice";
 import { Dispatch } from "@reduxjs/toolkit";
-import { isAxiosError } from "axios";
+import axios from "axios";
+import * as z from "zod"; 
 
-export const catchErrorHAndler = (error: unknown, dispatch: Dispatch) => {
+export const catchErrorHandler = (error: unknown, dispatch: Dispatch) => {
 
-    if(isAxiosError(error)) {
-        dispatch(setErrorAC({ error: error.response?.data?.message || error.message })); // network - fetch error
-    } else if(error instanceof Error) {
-        dispatch(setErrorAC({ error: error.message }));
-    } else {
-        dispatch(setErrorAC({ error: "Somethink went wrong" }));
+    let errorMesage;
+
+    switch(true) {
+        case axios.isAxiosError(error):
+            errorMesage = error.response?.data?.message || error.message;
+            break;
+        case error instanceof z.ZodError:
+            errorMesage = "ZodError look in console";
+            console.table (error.issues); 
+            break;
+        case error instanceof Error:
+            errorMesage = `NAtive error: ${error.message}`
+            break;
+        default:
+            errorMesage = JSON.stringify(error);
     }
 
+    dispatch(setErrorAC({ error: errorMesage})); // network - fetch error
     dispatch(changeStatusAC({ status: "failed" })); 
 }

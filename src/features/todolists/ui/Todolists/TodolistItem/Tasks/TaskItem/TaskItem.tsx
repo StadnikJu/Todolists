@@ -1,6 +1,5 @@
 import { EditableSpan } from "@/common/components/EditableSpan/EditableSpan";
 import { useAppDispatch } from "@/common/hooks/useAppDispatch";
-import { updateTaskTC, deleteTaskTC } from "@/features/todolists/model/tasks-slice";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Checkbox from "@mui/material/Checkbox";
 import IconButton from "@mui/material/IconButton";
@@ -9,7 +8,8 @@ import type { ChangeEvent } from "react";
 import { getListItemSx } from "./TaskItem.styles";
 import { TaskStatus } from "@/common/enum/enums";
 import { DomainTask } from "@/features/todolists/api/tasksApi.types";
-import { DomainTodolist } from "@/features/todolists/model/todolists-slice";
+import { DomainTodolist } from "@/features/todolists/model/slices/todolists-slice";
+import { deleteTaskTC, updateTaskTC } from "@/features/todolists/model/slices/tasks-slice";
 
 type Props = {
   task: DomainTask;

@@ -1,10 +1,14 @@
-import { createTodolistTC, deleteTodolistTC } from "./todolists-slice";
-import { catchErrorHAndler, createAppSlice, resultCodeHandler } from "@/common/utils";
-import { tasksApi } from "../api/tasksApi";
-import { DomainTask, UpdateTaskModel } from "../api/tasksApi.types";
+import { catchErrorHandler, createAppSlice, resultCodeHandler } from "@/common/utils";
 import { changeStatusAC } from "@/app/app-slice";
 import { RootState } from "@/app/store";
 import { ResultCode } from "@/common/enum/enums";
+import { createTodolistTC, deleteTodolistTC } from "./todolists-slice";
+import { tasksApi } from "../../api/tasksApi";
+import { DomainTask, UpdateTaskModel } from "../../api/tasksApi.types";
+import { domainTaskSchema } from "../schemes/todolists.schema";
+
+
+// domainTaskSchema.array().parse(res.data.items); // zod
 
 export const tasksSlice = createAppSlice({
   name: "tasks",
@@ -19,9 +23,11 @@ export const tasksSlice = createAppSlice({
           try {
             dispatch(changeStatusAC({ status: "loading" }));
             const res = await tasksApi.getTasks(todolistId);
-            return { todolistId, tasks: res.data.items };
+            const tasks = domainTaskSchema.array().parse(res.data.items); // zod
+            return { todolistId, tasks };
           } catch (error) {
-            return rejectWithValue(error);
+            catchErrorHandler(error, dispatch);
+            return rejectWithValue(null);
           } finally {
             dispatch(changeStatusAC({ status: "idle" }));
           }
@@ -37,18 +43,17 @@ export const tasksSlice = createAppSlice({
           try {
             dispatch(changeStatusAC({ status: "loading" }));
             const res = await tasksApi.createTasks(args);
-            const newTask = res.data.data.item;
             
             if (res.data.resultCode === ResultCode.Success) {
+              const newTask = domainTaskSchema.parse(res.data.data.item); // ZOD
               return newTask;
             } else {
               resultCodeHandler(res.data, dispatch);
               return rejectWithValue(null);
             }
-
           } catch (error) {
-            catchErrorHAndler(error, dispatch);
-            return rejectWithValue(error);
+            catchErrorHandler(error, dispatch);
+            return rejectWithValue(null);
           } finally {
             dispatch(changeStatusAC({ status: "idle" }));
           }
@@ -65,17 +70,15 @@ export const tasksSlice = createAppSlice({
           try {
             dispatch(changeStatusAC({ status: "loading" }));
             const res = await tasksApi.deleteTasks(args);
-
             if(res.data.resultCode === ResultCode.Success) {
               return args;
             } else {
-              catchErrorHAndler(res.data, dispatch);
+              catchErrorHandler(res.data, dispatch);
               return rejectWithValue(null)
             }
-
           } catch (error) {
-            catchErrorHAndler(error, dispatch);
-            return rejectWithValue(error);
+            catchErrorHandler(error, dispatch);
+            return rejectWithValue(null);
           } finally {
             dispatch(changeStatusAC({ status: "idle" }));
           }
@@ -119,15 +122,16 @@ export const tasksSlice = createAppSlice({
             const res = await tasksApi.updateTask({ todolistId: args.todolistId, taskId: args.taskId, model });
 
             if(res.data.resultCode === ResultCode.Success) {
-              return { task: res.data.data.item };
+              const updatedTask = domainTaskSchema.parse(res.data.data.item) // ZOD
+              return { task: updatedTask}
             } else {
-              catchErrorHAndler(res.data, dispatch);
+              catchErrorHandler(res.data, dispatch);
               return rejectWithValue(null);
             }
             
           } catch (error) {
-            catchErrorHAndler(error, dispatch);
-            return rejectWithValue(error);
+            catchErrorHandler(error, dispatch);
+            return rejectWithValue(null);
           } finally {
             dispatch(changeStatusAC({ status: "idle" }));
           }

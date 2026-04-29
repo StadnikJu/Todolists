@@ -1,12 +1,11 @@
 import { useAppSelector } from "@/common/hooks/useAppSelector";
-
 import { TaskItem } from "./TaskItem/TaskItem";
 import List from "@mui/material/List";
-import { DomainTodolist } from "@/features/todolists/model/todolists-slice";
 import { useEffect } from "react";
 import { useAppDispatch } from "@/common/hooks";
-import { fetchTasksTC, selectTasks } from "@/features/todolists/model/tasks-slice";
 import { TaskStatus } from "@/common/enum/enums";
+import { DomainTodolist } from "@/features/todolists/model/slices/todolists-slice";
+import { fetchTasksTC, selectTasks } from "@/features/todolists/model/slices/tasks-slice";
 
 type Props = {
   todolist: DomainTodolist;

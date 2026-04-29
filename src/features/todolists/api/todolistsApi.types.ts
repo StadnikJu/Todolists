@@ -1,6 +1,4 @@
-export type Todolist = {
-  id: string;
-  title: string;
-  addedDate: string;
-  order: number;
-};
+import * as z from "zod"; 
+import { todolistSchema } from "../model/schemes/todolists.schema";
+
+export type Todolist = z.infer<typeof todolistSchema>;
