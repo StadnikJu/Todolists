@@ -1,6 +1,10 @@
 import { useAppDispatch } from "@/common/hooks/useAppDispatch";
 import { containerSx } from "@/common/styles/container.styles";
-import { changeTodolistFilterAC, DomainTodolist, FilterValues } from "@/features/todolists/model/slices/todolists-slice";
+import {
+  changeTodolistFilterAC,
+  DomainTodolist,
+  FilterValues,
+} from "@/features/todolists/model/slices/todolists-slice";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 

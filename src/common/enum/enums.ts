@@ -4,7 +4,7 @@ export enum TaskStatus {
   Completed = 2,
   Draft = 3,
 }
- 
+
 export enum TaskPriority {
   Low = 0,
   Middle = 1,

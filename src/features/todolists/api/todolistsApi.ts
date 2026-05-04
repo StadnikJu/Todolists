@@ -1,6 +1,6 @@
 import { instance } from "@/common/instance/instance";
 import { BaseResponse } from "@/common/types";
-import { DomainTodolist } from "../model/todolists-slice";
+import { DomainTodolist } from "../model/slices/todolists-slice";
 
 export const todolistsApi = {
   getTodolists: () => {

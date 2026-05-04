@@ -6,7 +6,6 @@ import { CreateItemForm } from "@/common/components/CreateItemForm/CreateItemFor
 import { DomainTodolist } from "@/features/todolists/model/slices/todolists-slice";
 import { createTaskTC } from "@/features/todolists/model/slices/tasks-slice";
 
-
 type Props = {
   todolist: DomainTodolist;
 };

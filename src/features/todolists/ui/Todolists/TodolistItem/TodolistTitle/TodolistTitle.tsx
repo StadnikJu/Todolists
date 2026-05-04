@@ -3,7 +3,11 @@ import { EditableSpan } from "@/common/components/EditableSpan/EditableSpan";
 import DeleteIcon from "@mui/icons-material/Delete";
 import IconButton from "@mui/material/IconButton";
 import styles from "./TodolistTitle.module.css";
-import { changeTodolistTitleTC, deleteTodolistTC, DomainTodolist } from "@/features/todolists/model/slices/todolists-slice";
+import {
+  changeTodolistTitleTC,
+  deleteTodolistTC,
+  DomainTodolist,
+} from "@/features/todolists/model/slices/todolists-slice";
 
 type Props = {
   todolist: DomainTodolist;
@@ -27,7 +31,7 @@ export const TodolistTitle = ({ todolist }: Props) => {
       <h3>
         <EditableSpan value={title} onChange={changeTodolistTitle} />
       </h3>
-      <IconButton onClick={deleteTodolist} disabled={ entityStatus === "loading" }>
+      <IconButton onClick={deleteTodolist} disabled={entityStatus === "loading"}>
         <DeleteIcon />
       </IconButton>
     </div>

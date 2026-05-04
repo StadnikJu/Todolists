@@ -18,5 +18,5 @@ export const todolistSchema = z.object({
   id: z.string(),
   title: z.string(),
   addedDate: z.string(),
-  order: z.number()
-})
+  order: z.number(),
+});

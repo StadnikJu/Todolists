@@ -1,8 +1,8 @@
-import { Button, Container } from "@mui/material"
-import styles from "./PageNotFound.module.css"
-import { Path } from "../Routing/Roting"
-import { Link } from "react-router"
- 
+import { Button, Container } from "@mui/material";
+import styles from "./PageNotFound.module.css";
+import { Path } from "../Routing/Routing";
+import { Link } from "react-router";
+
 export const PageNotFound = () => (
   <Container sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
     <h1 className={styles.title}>404</h1>
@@ -11,4 +11,4 @@ export const PageNotFound = () => (
       Return to the main page
     </Button>
   </Container>
-)
+);

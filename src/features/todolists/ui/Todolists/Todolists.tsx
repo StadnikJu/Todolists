@@ -12,7 +12,7 @@ export const Todolists = () => {
 
   useEffect(() => {
     dispatch(fetchTodolistsTC());
-  }, [])
+  }, []);
 
   return (
     <>

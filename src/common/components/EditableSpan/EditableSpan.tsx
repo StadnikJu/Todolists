@@ -12,7 +12,7 @@ export const EditableSpan = ({ value, onChange, disabled }: Props) => {
   const [isEditMode, setIsEditMode] = useState(false);
 
   const turnOnEditMode = () => {
-    if(disabled) return 
+    if (disabled) return;
     setIsEditMode(true);
   };
 

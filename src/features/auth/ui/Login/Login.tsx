@@ -1,10 +1,11 @@
 import { selectThemeMode } from "@/app/app-slice";
-import { useAppSelector } from "@/common/hooks";
+import { useAppDispatch, useAppSelector } from "@/common/hooks";
 import { getTheme } from "@/common/theme";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoginSchema } from "../../model/schemes";
 import { LoginInputs } from "../../model/loginTypes";
+import { loginTC } from "../../model/slices/auth-slice";
 import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
 import FormControl from "@mui/material/FormControl";
@@ -13,26 +14,31 @@ import FormGroup from "@mui/material/FormGroup";
 import FormLabel from "@mui/material/FormLabel";
 import Grid from "@mui/material/Grid2";
 import TextField from "@mui/material/TextField";
-
+import styles from "./Login.module.css";
 
 export const Login = () => {
   const themeMode = useAppSelector(selectThemeMode);
-
   const theme = getTheme(themeMode);
+  const dispatch = useAppDispatch();
 
   const {
     handleSubmit,
+    register,
     control,
+    formState: { errors },
     reset,
-    formState: { },
+    formState: {},
   } = useForm<LoginInputs>({
-    defaultValues: { email: "stadnykjulia14@icloud.com", password: "123", rememberMe: false },
-    resolver: zodResolver(LoginSchema)
+    defaultValues: { email: "", password: "", rememberMe: false },
+    resolver: zodResolver(LoginSchema),
   });
 
   const onSubmit = (data: LoginInputs) => {
-    console.log(data);
-    reset(); 
+    dispatch(loginTC(data))
+      .unwrap()
+      .then(() => {
+        reset();
+      });
   };
 
   return (
@@ -60,32 +66,17 @@ export const Login = () => {
         </FormLabel>
         <form onSubmit={handleSubmit(onSubmit)}>
           <FormGroup>
-            <Controller
-              name="email"
-              control={control}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  label="Email"
-                  margin="normal"
-                  error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
-                />
-              )}
+            <TextField label="Email" margin="normal" error={!!errors.email} {...register("email")} />
+            {errors.email && <span className={styles.errorMessage}>{errors.email.message}</span>}
+
+            <TextField
+              type="password"
+              label="Password"
+              margin="normal"
+              error={!!errors.password}
+              {...register("password")}
             />
-            <Controller
-              name="password"
-              control={control}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  label="Password"
-                  margin="normal"
-                  error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
-                />
-              )}
-            />
+            {errors.password && <span className={styles.errorMessage}>{errors.password.message}</span>}
             <FormControlLabel
               label="Remember me"
               control={

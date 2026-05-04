@@ -5,6 +5,7 @@ import { ResultCode } from "@/common/enum/enums";
 import { todolistsApi } from "../../api/todolistsApi";
 import { Todolist } from "../../api/todolistsApi.types";
 import { todolistSchema } from "../schemes/todolists.schema";
+import { clearTasksAndTodolists } from "@/common/actions/common.actions";
 
 export const todolistsSlice = createAppSlice({
   name: "todolists",
@@ -46,13 +47,12 @@ export const todolistsSlice = createAppSlice({
             dispatch(changeStatusAC({ status: "idle" }));
 
             if (res.data.resultCode === ResultCode.Success) {
-              const todolist = todolistSchema.parse(res.data.data.item) // ZOD
+              const todolist = todolistSchema.parse(res.data.data.item); // ZOD
               return { todolist };
             } else {
               resultCodeHandler(res.data, dispatch);
               return rejectWithValue(null);
             }
-
           } catch (error) {
             catchErrorHandler(error, dispatch);
             return rejectWithValue(null);
@@ -94,13 +94,12 @@ export const todolistsSlice = createAppSlice({
             dispatch(changeStatusAC({ status: "loading" }));
             const res = await todolistsApi.changeTodolistTitle(args.id, args.title);
 
-            if(res.data.resultCode === ResultCode.Success) {
+            if (res.data.resultCode === ResultCode.Success) {
               return args;
             } else {
               resultCodeHandler(res.data, dispatch);
               return rejectWithValue(null);
             }
-            
           } catch (error) {
             catchErrorHandler(error, dispatch);
             return rejectWithValue(null);
@@ -131,6 +130,12 @@ export const todolistsSlice = createAppSlice({
       }),
     };
   },
+  extraReducers: (builder) => {
+    builder
+      .addCase(clearTasksAndTodolists, (_state, action) => {
+        return action.payload.todolists;
+      })
+  }
 });
 
 export const {

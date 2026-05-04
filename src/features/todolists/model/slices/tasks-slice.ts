@@ -6,9 +6,7 @@ import { createTodolistTC, deleteTodolistTC } from "./todolists-slice";
 import { tasksApi } from "../../api/tasksApi";
 import { DomainTask, UpdateTaskModel } from "../../api/tasksApi.types";
 import { domainTaskSchema } from "../schemes/todolists.schema";
-
-
-// domainTaskSchema.array().parse(res.data.items); // zod
+import { clearTasksAndTodolists } from "@/common/actions/common.actions";
 
 export const tasksSlice = createAppSlice({
   name: "tasks",
@@ -43,7 +41,7 @@ export const tasksSlice = createAppSlice({
           try {
             dispatch(changeStatusAC({ status: "loading" }));
             const res = await tasksApi.createTasks(args);
-            
+
             if (res.data.resultCode === ResultCode.Success) {
               const newTask = domainTaskSchema.parse(res.data.data.item); // ZOD
               return newTask;
@@ -70,11 +68,11 @@ export const tasksSlice = createAppSlice({
           try {
             dispatch(changeStatusAC({ status: "loading" }));
             const res = await tasksApi.deleteTasks(args);
-            if(res.data.resultCode === ResultCode.Success) {
+            if (res.data.resultCode === ResultCode.Success) {
               return args;
             } else {
               catchErrorHandler(res.data, dispatch);
-              return rejectWithValue(null)
+              return rejectWithValue(null);
             }
           } catch (error) {
             catchErrorHandler(error, dispatch);
@@ -121,14 +119,13 @@ export const tasksSlice = createAppSlice({
 
             const res = await tasksApi.updateTask({ todolistId: args.todolistId, taskId: args.taskId, model });
 
-            if(res.data.resultCode === ResultCode.Success) {
-              const updatedTask = domainTaskSchema.parse(res.data.data.item) // ZOD
-              return { task: updatedTask}
+            if (res.data.resultCode === ResultCode.Success) {
+              const updatedTask = domainTaskSchema.parse(res.data.data.item); // ZOD
+              return { task: updatedTask };
             } else {
               catchErrorHandler(res.data, dispatch);
               return rejectWithValue(null);
             }
-            
           } catch (error) {
             catchErrorHandler(error, dispatch);
             return rejectWithValue(null);
@@ -146,7 +143,7 @@ export const tasksSlice = createAppSlice({
             }
           },
         },
-      ),
+      )
     };
   },
   extraReducers: (builder) => {
@@ -156,10 +153,13 @@ export const tasksSlice = createAppSlice({
       })
       .addCase(deleteTodolistTC.fulfilled, (state, action) => {
         delete state[action.payload.id];
-      });
+      })
+      .addCase(clearTasksAndTodolists, (_state, action) => {
+        return action.payload.tasks;
+      })
   },
 });
- 
+
 export const { fetchTasksTC, createTaskTC, deleteTaskTC, updateTaskTC } = tasksSlice.actions;
 export const tasksReducer = tasksSlice.reducer;
 
