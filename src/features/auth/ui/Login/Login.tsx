@@ -1,11 +1,12 @@
-import { selectThemeMode } from "@/app/app-slice";
+import { selectThemeMode, setIsLoggedInAC } from "@/app/app-slice";
 import { useAppDispatch, useAppSelector } from "@/common/hooks";
 import { getTheme } from "@/common/theme";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoginSchema } from "../../model/schemes";
 import { LoginInputs } from "../../model/loginTypes";
-import { loginTC } from "../../model/slices/auth-slice";
+import { useLoginMutation } from "../../api/authApi";
+import { ResultCode } from "@/common/enum/enums";
 import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
 import FormControl from "@mui/material/FormControl";
@@ -20,24 +21,30 @@ export const Login = () => {
   const themeMode = useAppSelector(selectThemeMode);
   const theme = getTheme(themeMode);
   const dispatch = useAppDispatch();
+  const [login] = useLoginMutation();
 
   const {
     handleSubmit,
     register,
+    reset,
     control,
     formState: { errors },
-    reset,
     formState: {},
   } = useForm<LoginInputs>({
     defaultValues: { email: "", password: "", rememberMe: false },
     resolver: zodResolver(LoginSchema),
   });
 
-  const onSubmit = (data: LoginInputs) => {
-    dispatch(loginTC(data))
+  const onSubmit: SubmitHandler<LoginInputs> = (data: LoginInputs) => {
+    login(data)
       .unwrap()
-      .then(() => {
-        reset();
+      .then((response) => {
+        if (response.resultCode === ResultCode.Success) {
+          const token = response.data.token;
+          localStorage.setItem("token", token);
+          dispatch(setIsLoggedInAC({ isLoggedIn: true }));
+          reset();
+        }
       });
   };
 
