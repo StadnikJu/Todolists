@@ -1,4 +1,4 @@
-import { changeThemeModeAC, selectIsLoggedIn, selectStatus, selectThemeMode } from "@/app/app-slice";
+import { changeThemeModeAC, selectIsLoggedIn, selectStatus, selectThemeMode, setIsLoggedInAC } from "@/app/app-slice";
 import { useAppDispatch } from "@/common/hooks/useAppDispatch";
 import { useAppSelector } from "@/common/hooks/useAppSelector";
 import { containerSx } from "@/common/styles/container.styles";
@@ -13,6 +13,7 @@ import IconButton from "@mui/material/IconButton";
 import Switch from "@mui/material/Switch";
 import Toolbar from "@mui/material/Toolbar";
 import { ResultCode } from "@/common/enum/enums";
+import { baseApi } from "@/app/baseApi";
 
 export const Header = () => {
   const themeMode = useAppSelector(selectThemeMode);
@@ -30,12 +31,17 @@ export const Header = () => {
   };
 
   const logoutHandler = () => {
-    logout().unwrap().then((response) => {
-      if (response.resultCode === ResultCode.Success) {
-        localStorage.removeItem("token");
-        return { isLoggedIn: false, userEmail: "" };
-      }
-    });
+    logout()
+      .unwrap()
+      .then((response) => {
+        if (response.resultCode === ResultCode.Success) {
+          localStorage.removeItem("token");
+          dispatch(setIsLoggedInAC({ isLoggedIn: false }));
+        }
+      })
+      .then(() => {
+        dispatch(baseApi.util.invalidateTags(["Task", "Todolist"]));
+      })
   };
 
   return (
@@ -46,7 +52,7 @@ export const Header = () => {
             <MenuIcon />
           </IconButton>
           <div>
-            {isLoggedIn && <NavButton onClick={logoutHandler}>Logout</NavButton>}
+            {isLoggedIn && <NavButton onClick={logoutHandler}>Sign Out</NavButton>}
             <NavButton background={theme.palette.primary.dark}>Faq</NavButton>
             <Switch color={"default"} onChange={changeMode} />
           </div>

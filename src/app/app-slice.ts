@@ -1,5 +1,7 @@
 import { RequestStatus } from "@/common/types";
-import { createSlice } from "@reduxjs/toolkit";
+import { tasksApi } from "@/features/todolists/api/tasksApi";
+import { todolistsApi } from "@/features/todolists/api/todolistsApi";
+import { createSlice, isFulfilled, isPending, isRejected } from "@reduxjs/toolkit";
 
 export const appSlice = createSlice({
   name: "app",
@@ -30,6 +32,22 @@ export const appSlice = createSlice({
         state.isLoggedIn = action.payload.isLoggedIn;
       }),
     };
+  },
+  extraReducers: (builder) => {
+    builder
+      .addMatcher(isPending(), (state, action: any) => {
+        if (
+          todolistsApi.endpoints.getTodolists.matchPending(action) ||
+          tasksApi.endpoints.getTasks.matchPending(action)
+        ) return;
+        state.status = "loading";
+      })
+      .addMatcher(isFulfilled(), (state, _action) => {
+        state.status = "succeeded";
+      })
+      .addMatcher(isRejected(), (state, _action) => {
+        state.status = "failed";
+      });
   },
 });
 
