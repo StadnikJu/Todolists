@@ -6,6 +6,7 @@ import { CreateItemForm } from "@/common/components/CreateItemForm/CreateItemFor
 import { useCreateTaskMutation } from "@/features/todolists/api/tasksApi";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { Box } from "@mui/material";
 
 type Props = {
   todolist: DomainTodolist;
@@ -21,15 +22,22 @@ export const TodolistItem = ({ todolist }: Props) => {
   return (
     <div
       ref={setNodeRef}
-      {...attributes}
-      {...listeners}
       style={{
         transform: CSS.Transform.toString(transform),
         transition,
-        cursor: "grab",
       }}
     >
-      <TodolistTitle todolist={todolist} />
+      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <Box
+          component="div"
+          {...attributes}
+          {...listeners}
+          sx={{ cursor: "grab", ":active": { cursor: "grabbing" }}}
+        />
+        <div style={{ flex: 1 }}>
+          <TodolistTitle todolist={todolist} />
+        </div>
+      </div>
       <CreateItemForm onCreateItem={createTaskHandler} disabled={todolist.entityStatus === "loading"} />
       <Tasks todolist={todolist} />
       <FilterButtons todolist={todolist} />

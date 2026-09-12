@@ -12,6 +12,7 @@ import { createTaskModel } from "@/common/utils";
 import { DomainTodolist } from "@/features/todolists/lib/types";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { Box } from "@mui/material";
 
 type Props = {
   task: DomainTask;
@@ -44,19 +45,21 @@ export const TaskItem = ({ task, todolist }: Props) => {
     <ListItem
       sx={{
         ...getListItemSx(isTaskCompleted),
-        cursor: "grab",
-        "&:active": {
-          cursor: "grabbing",
-        },
       }}
       style={{ transform: CSS.Transform.toString(transform), transition }}
       ref={setNodeRef}
-      {...attributes}
-      {...listeners}
     >
-      <div>
-        <Checkbox checked={isTaskCompleted} onChange={changeTaskStatus} disabled={disabled} />
-        <EditableSpan value={task.title} onChange={changeTaskTitle} disabled={disabled} />
+      <div style={{ display: "flex", alignItems: "center", flex: 1 }}>
+        <Box
+          component="div"
+          {...attributes}
+          {...listeners}
+          sx={{cursor: "grab", "&:active": { cursor: "grabbing" }}}
+        />
+        <div>
+          <Checkbox checked={isTaskCompleted} onChange={changeTaskStatus} disabled={disabled} />
+          <EditableSpan value={task.title} onChange={changeTaskTitle} disabled={disabled} />
+        </div>
       </div>
       <IconButton onClick={deleteTaskHandler} disabled={disabled}>
         <DeleteIcon />
