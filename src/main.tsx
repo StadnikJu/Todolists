@@ -7,7 +7,7 @@ import "./index.css";
 
 createRoot(document.getElementById("root")!).render(
   <Provider store={store}>
-    <BrowserRouter>
+    <BrowserRouter  basename="/Todolists">
       <App />
     </BrowserRouter>
   </Provider>,
