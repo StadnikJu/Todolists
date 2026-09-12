@@ -5,7 +5,7 @@ import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoginSchema } from "../../model/schemes";
 import { LoginInputs } from "../../model/loginTypes";
-import { useLoginMutation } from "../../api/authApi";
+import { useLazySecurityQuery, useLoginMutation } from "../../api/authApi";
 import { ResultCode } from "@/common/enum/enums";
 import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
@@ -16,12 +16,20 @@ import FormLabel from "@mui/material/FormLabel";
 import Grid from "@mui/material/Grid2";
 import TextField from "@mui/material/TextField";
 import styles from "./Login.module.css";
+import { useState } from "react";
+import { IconButton, InputAdornment } from "@mui/material";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 
 export const Login = () => {
   const themeMode = useAppSelector(selectThemeMode);
   const theme = getTheme(themeMode);
   const dispatch = useAppDispatch();
   const [login] = useLoginMutation();
+  const [getCaptcha, { data }] = useLazySecurityQuery();
+  const [showPassword, setShowPassword] = useState(false);
+
+  const captchaUrl = data?.url;
 
   const {
     handleSubmit,
@@ -36,6 +44,8 @@ export const Login = () => {
   });
 
   const onSubmit: SubmitHandler<LoginInputs> = (data: LoginInputs) => {
+     console.log(data);
+     console.log("SUBMIT");
     login(data)
       .unwrap()
       .then((response) => {
@@ -44,7 +54,9 @@ export const Login = () => {
           localStorage.setItem("token", token);
           dispatch(setIsLoggedInAC({ isLoggedIn: true }));
           reset();
-        }
+        } else if(response.resultCode === ResultCode.CaptchaError) {
+          getCaptcha();
+        } 
       });
   };
 
@@ -77,11 +89,20 @@ export const Login = () => {
             {errors.email && <span className={styles.errorMessage}>{errors.email.message}</span>}
 
             <TextField
-              type="password"
+              type={showPassword ? "text" : "password"}
               label="Password"
               margin="normal"
               error={!!errors.password}
               {...register("password")}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end" >
+                    <IconButton onClick={() => setShowPassword(!showPassword)}>
+                      {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
             />
             {errors.password && <span className={styles.errorMessage}>{errors.password.message}</span>}
             <FormControlLabel
@@ -96,6 +117,12 @@ export const Login = () => {
                 />
               }
             />
+            {captchaUrl && (
+              <>
+                <img src={captchaUrl} alt="Captcha" style={{ marginTop: "10px" }}/>
+                <TextField label="Введите код" margin="normal" {...register("captcha")} />
+              </>
+            )}
             <Button type="submit" variant="contained" color="primary">
               Login
             </Button>
@@ -105,3 +132,5 @@ export const Login = () => {
     </Grid>
   );
 };
+
+

@@ -18,12 +18,34 @@ export const todolistsApi = baseApi.injectEndpoints({
     }),
     deleteTodolist: builder.mutation<BaseResponse, string>({
       query: (id) => ({ method: "delete", url: `/todo-lists/${id}` }),
+      async onQueryStarted (id, {dispatch, queryFulfilled}) {
+        const patchResult = dispatch(
+          todolistsApi.util.updateQueryData("getTodolists", undefined, (todolists) => {
+            const index = todolists.findIndex((todo) => todo.id === id);
+            if (index !== -1) todolists.splice(index, 1);
+          }),
+        );
+
+        try {
+          await queryFulfilled;
+        } catch (e) {
+          patchResult.undo();
+        }
+      },
       invalidatesTags: ["Todolist"],
     }),
     changeTodolistTitle: builder.mutation<BaseResponse, { title: string; id: string }>({
       query: ({ title, id }) => ({ method: "put", url: `/todo-lists/${id}`, body: { title } }),
       invalidatesTags: ["Todolist"],
     }),
+    reorderTodolist: builder.mutation<BaseResponse, {todolistId: string, putAfterItemId: string | null}>({
+      query: ({todolistId, putAfterItemId}) => ({
+        method: "put",
+        url: `/todo-lists/${todolistId}/reorder`,
+        body: { putAfterItemId }
+      }),
+      invalidatesTags: ["Todolist"],
+    })
   }),
 });
 
@@ -32,6 +54,5 @@ export const {
   useCreateTodolistMutation,
   useDeleteTodolistMutation,
   useChangeTodolistTitleMutation,
+  useReorderTodolistMutation
 } = todolistsApi;
-
-

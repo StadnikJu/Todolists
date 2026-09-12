@@ -6,14 +6,14 @@ import { getTheme } from "@/common/theme/theme";
 import { NavButton } from "@/common/components/NavButton/NavButton";
 import { LinearProgress } from "@mui/material";
 import { useLogoutMutation } from "@/features/auth/api/authApi";
+import { ResultCode } from "@/common/enum/enums";
+import { baseApi } from "@/app/baseApi";
 import MenuIcon from "@mui/icons-material/Menu";
 import AppBar from "@mui/material/AppBar";
 import Container from "@mui/material/Container";
 import IconButton from "@mui/material/IconButton";
 import Switch from "@mui/material/Switch";
 import Toolbar from "@mui/material/Toolbar";
-import { ResultCode } from "@/common/enum/enums";
-import { baseApi } from "@/app/baseApi";
 
 export const Header = () => {
   const themeMode = useAppSelector(selectThemeMode);

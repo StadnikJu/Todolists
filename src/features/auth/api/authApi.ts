@@ -12,8 +12,11 @@ export const authApi = baseApi.injectEndpoints({
     }),
     authme: builder.query<BaseResponse<{ id: number; email: string; login: string}>, void>({
       query: () => "/auth/me"
+    }),
+    security: builder.query<{ url: string }, void>({
+      query: () => "/security/get-captcha-url"
     })
   })
 })
 
-export const { useLoginMutation, useLogoutMutation, useAuthmeQuery } = authApi;
+export const { useLoginMutation, useLogoutMutation, useAuthmeQuery, useLazySecurityQuery } = authApi;
